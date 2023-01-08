@@ -1,0 +1,17 @@
+body {
+  margin: 0 auto;
+}
+
+#videos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 10px;
+}
+
+video {
+  max-width: 400px;
+  margin: 1rem;
+  background-color: rgb(63, 62, 62);
+}
