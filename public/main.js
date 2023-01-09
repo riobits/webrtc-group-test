@@ -61,60 +61,60 @@ const init = async () => {
 }
 
 const createOffer = async (userId) => {
-  users[userId] = { mypc: new RTCPeerConnection(servers) }
+  users[userId] = new RTCPeerConnection(servers)
 
   const remoteStream = addVideoStream(userId)
 
   localStream.getTracks().forEach((track) => {
-    users[userId].mypc.addTrack(track, localStream)
+    users[userId].addTrack(track, localStream)
   })
 
-  users[userId].mypc.ontrack = (event) => {
+  users[userId].ontrack = (event) => {
     event.streams[0].getTracks().forEach((track) => {
       remoteStream.addTrack(track)
     })
   }
 
-  users[userId].mypc.onicecandidate = () => {
-    if (users[userId].mypc.iceGatheringState === 'complete') {
-      socket.emit('offer', userId, users[userId].mypc.localDescription)
+  users[userId].onicecandidate = () => {
+    if (users[userId].iceGatheringState === 'complete') {
+      socket.emit('offer', userId, users[userId].localDescription)
     }
   }
 
-  const offer = await users[userId].mypc.createOffer()
-  await users[userId].mypc.setLocalDescription(offer)
+  const offer = await users[userId].createOffer()
+  await users[userId].setLocalDescription(offer)
 }
 
 const createAnswer = async (userId, offer) => {
-  users[userId] = { ...users[userId], pc: new RTCPeerConnection(servers) }
+  users[userId] = new RTCPeerConnection(servers)
 
   const remoteStream = addVideoStream(userId)
 
   localStream.getTracks().forEach((track) => {
-    users[userId].pc.addTrack(track, localStream)
+    users[userId].addTrack(track, localStream)
   })
 
-  users[userId].pc.ontrack = (event) => {
+  users[userId].ontrack = (event) => {
     event.streams[0].getTracks().forEach((track) => {
       remoteStream.addTrack(track)
     })
   }
 
-  users[userId].pc.onicecandidate = () => {
-    if (users[userId].pc.iceGatheringState === 'complete') {
-      socket.emit('answer', userId, users[userId].pc.localDescription)
+  users[userId].onicecandidate = () => {
+    if (users[userId].iceGatheringState === 'complete') {
+      socket.emit('answer', userId, users[userId].localDescription)
     }
   }
 
-  await users[userId].pc.setRemoteDescription(offer)
+  await users[userId].setRemoteDescription(offer)
 
-  const answer = await users[userId].pc.createAnswer()
-  await users[userId].pc.setLocalDescription(answer)
+  const answer = await users[userId].createAnswer()
+  await users[userId].setLocalDescription(answer)
 }
 
 const addAnswer = async (userId, answer) => {
-  if (!users[userId].mypc.currentRemoteDescription) {
-    users[userId].mypc.setRemoteDescription(answer)
+  if (!users[userId].currentRemoteDescription) {
+    users[userId].setRemoteDescription(answer)
   }
 }
 
