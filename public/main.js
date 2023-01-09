@@ -3,6 +3,10 @@ const users = {}
 
 const socket = io()
 
+socket.on('ping', () => {
+  socket.emit('pong')
+})
+
 const servers = {
   iceServers: [
     {

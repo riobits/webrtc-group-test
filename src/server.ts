@@ -4,7 +4,10 @@ import { Server } from 'socket.io'
 
 const app = express()
 const server = http.createServer(app)
-const io = new Server(server)
+const io = new Server(server, {
+  pingInterval: 1000 * 60,
+  pingTimeout: 10000,
+})
 
 app.use(express.static('public'))
 
