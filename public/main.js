@@ -86,32 +86,30 @@ const createOffer = async (userId) => {
 }
 
 const createAnswer = async (userId, offer) => {
-  if (!users[userId]) {
-    users[userId] = { ...users[userId], pc: new RTCPeerConnection(servers) }
+  users[userId] = { ...users[userId], pc: new RTCPeerConnection(servers) }
 
-    const remoteStream = addVideoStream(userId)
+  const remoteStream = addVideoStream(userId)
 
-    localStream.getTracks().forEach((track) => {
-      users[userId].pc.addTrack(track, localStream)
+  localStream.getTracks().forEach((track) => {
+    users[userId].pc.addTrack(track, localStream)
+  })
+
+  users[userId].pc.ontrack = (event) => {
+    event.streams[0].getTracks().forEach((track) => {
+      remoteStream.addTrack(track)
     })
-
-    users[userId].pc.ontrack = (event) => {
-      event.streams[0].getTracks().forEach((track) => {
-        remoteStream.addTrack(track)
-      })
-    }
-
-    users[userId].pc.onicecandidate = () => {
-      if (users[userId].pc.iceGatheringState === 'complete') {
-        socket.emit('answer', userId, users[userId].pc.localDescription)
-      }
-    }
-
-    await users[userId].pc.setRemoteDescription(offer)
-
-    const answer = await users[userId].pc.createAnswer()
-    await users[userId].pc.setLocalDescription(answer)
   }
+
+  users[userId].pc.onicecandidate = () => {
+    if (users[userId].pc.iceGatheringState === 'complete') {
+      socket.emit('answer', userId, users[userId].pc.localDescription)
+    }
+  }
+
+  await users[userId].pc.setRemoteDescription(offer)
+
+  const answer = await users[userId].pc.createAnswer()
+  await users[userId].pc.setLocalDescription(answer)
 }
 
 const addAnswer = async (userId, answer) => {
