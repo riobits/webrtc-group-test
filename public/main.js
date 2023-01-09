@@ -57,6 +57,7 @@ const init = async () => {
   socket.on('join', createOffer)
   socket.on('offer', createAnswer)
   socket.on('answer', addAnswer)
+  socket.on('candidate', addCandidate)
   socket.on('left', removeUser)
 }
 
@@ -75,14 +76,16 @@ const createOffer = async (userId) => {
     })
   }
 
-  users[userId].onicecandidate = () => {
-    if (users[userId].iceGatheringState === 'complete') {
-      socket.emit('offer', userId, users[userId].localDescription)
+  users[userId].onicecandidate = (event) => {
+    if (event.candidate) {
+      socket.emit('candidate', userId, event.candidate)
     }
   }
 
   const offer = await users[userId].createOffer()
   await users[userId].setLocalDescription(offer)
+
+  socket.emit('offer', userId, users[userId].localDescription)
 }
 
 const createAnswer = async (userId, offer) => {
@@ -100,9 +103,9 @@ const createAnswer = async (userId, offer) => {
     })
   }
 
-  users[userId].onicecandidate = () => {
-    if (users[userId].iceGatheringState === 'complete') {
-      socket.emit('answer', userId, users[userId].localDescription)
+  users[userId].onicecandidate = (event) => {
+    if (event.candidate) {
+      socket.emit('candidate', userId, event.candidate)
     }
   }
 
@@ -110,11 +113,19 @@ const createAnswer = async (userId, offer) => {
 
   const answer = await users[userId].createAnswer()
   await users[userId].setLocalDescription(answer)
+
+  socket.emit('answer', userId, users[userId].localDescription)
 }
 
-const addAnswer = async (userId, answer) => {
+const addAnswer = (userId, answer) => {
   if (!users[userId].currentRemoteDescription) {
     users[userId].setRemoteDescription(answer)
+  }
+}
+
+const addCandidate = (userId, candidate) => {
+  if (users[userId]) {
+    users[userId].addIceCandidate(candidate)
   }
 }
 

@@ -21,6 +21,10 @@ io.on('connection', (socket) => {
     socket.to(userId).emit('answer', socket.id, answer)
   })
 
+  socket.on('candidate', (userId, candidate) => {
+    socket.to(userId).emit('candidate', socket.id, candidate)
+  })
+
   socket.on('disconnect', () => {
     socket.broadcast.emit('left', socket.id)
   })
