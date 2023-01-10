@@ -1,5 +1,6 @@
 import express from 'express'
 import http from 'http'
+import path from 'path'
 import { Server } from 'socket.io'
 
 const app = express()
@@ -9,7 +10,7 @@ const io = new Server(server, {
   pingTimeout: 10000,
 })
 
-app.use(express.static('public'))
+app.use(express.static(path.join(__dirname, '..', 'public')))
 
 io.on('connection', (socket) => {
   const ping = setInterval(() => {
