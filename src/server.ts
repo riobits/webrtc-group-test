@@ -16,7 +16,7 @@ io.on('connection', (socket) => {
   const ping = setInterval(() => {
     socket.emit('ping')
   }, 1000)
-  
+
   socket.on('user-join', () => {
     socket.broadcast.emit('join', socket.id)
   })
@@ -32,7 +32,7 @@ io.on('connection', (socket) => {
   socket.on('candidate', (userId, candidate) => {
     socket.to(userId).emit('candidate', socket.id, candidate)
   })
-  
+
   socket.on('pong', () => {
     console.log('ping')
   })
@@ -44,6 +44,6 @@ io.on('connection', (socket) => {
   })
 })
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 8080
 
 server.listen(port, () => console.log(`Listening on port ${port}`))
