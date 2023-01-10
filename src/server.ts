@@ -28,7 +28,8 @@ io.on('connection', (socket) => {
     socket.to(userId).emit('candidate', socket.id, candidate)
   })
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', (reason) => {
+    console.log('User disconnected, reason: ' + reason)
     socket.broadcast.emit('left', socket.id)
   })
 })
