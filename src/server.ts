@@ -12,6 +12,10 @@ const io = new Server(server, {
 app.use(express.static('public'))
 
 io.on('connection', (socket) => {
+  const ping = setInterval(() => {
+    socket.emit('ping')
+  }, 1000)
+  
   socket.on('user-join', () => {
     socket.broadcast.emit('join', socket.id)
   })
@@ -27,8 +31,13 @@ io.on('connection', (socket) => {
   socket.on('candidate', (userId, candidate) => {
     socket.to(userId).emit('candidate', socket.id, candidate)
   })
+  
+  socket.on('pong', () => {
+    console.log('ping')
+  })
 
   socket.on('disconnect', (reason) => {
+    clearInterval(ping)
     console.log('User disconnected, reason: ' + reason)
     socket.broadcast.emit('left', socket.id)
   })
